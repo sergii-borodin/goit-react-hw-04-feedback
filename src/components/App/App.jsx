@@ -1,50 +1,69 @@
-import React, { Component } from "react";
-import FeedbackInputInterface from "../FeedbackInputInterface/FeedbackInputInterface"
-import Statistics from "../Statistics/Statistics";
-import Section from "../Section/Section";
+import React, { useState } from 'react';
+import FeedbackInputInterface from '../FeedbackInputInterface/FeedbackInputInterface';
+import Statistics from '../Statistics/Statistics';
+import Section from '../Section/Section';
 
-import { GlobalStyle } from "../GlobalStyle";
-import { MainContainer } from "./App.styled";
+import { GlobalStyle } from '../GlobalStyle';
+import { MainContainer } from './App.styled';
 
-class App extends Component{
-   state = {
-    good: 0,
-    neutral: 0,
-    bad: 0
-   };
-  
-  onLeaveFeedback = (event) => {
+const App = () => {
+  const [positive, setPositive] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [negative, setNegative] = useState(0);
+
+  const options = {
+    good: 'good',
+    neutral: 'neutral',
+    bad: 'bad,',
+  };
+
+  const onLeaveFeedback = event => {
     const stateKey = event.target.name;
-    return this.setState(prevState => ({
-      [stateKey]: prevState[stateKey] + 1
-    })); 
-  }
+    switch (stateKey) {
+      case 'good':
+        setPositive(positive + 1);
+        break;
+      case 'neutral':
+        setNeutral(neutral + 1);
+        break;
+      case 'bad':
+        setNegative(negative + 1);
+        break;
 
-  countTotalFeedback = () => {
-    const { good, neutral, bad } = this.state;
-    return good + neutral + bad; 
-  }
+      default:
+        break;
+    }
+  };
 
-  countPositiveFeedbackPercentage = () => {
-    const total = this.countTotalFeedback();
-    return (this.state.good ? this.state.good * 100 / total : 0);
-  } 
+  const countTotalFeedback = () => {
+    return positive + neutral + negative;
+  };
 
-  render() {
-    return (<MainContainer>
+  const countPositiveFeedbackPercentage = () => {
+    const total = countTotalFeedback();
+    return positive ? (positive * 100) / total : 0;
+  };
+
+  return (
+    <MainContainer>
       <Section title="Please leave your feedback">
         <FeedbackInputInterface
-          onLeaveFeedback={this.onLeaveFeedback}
-            options={this.state} />
+          onLeaveFeedback={onLeaveFeedback}
+          options={options}
+        />
       </Section>
-      <Section title='Statistics'>
+      <Section title="Statistics">
         <Statistics
-               stats={this.state} total={this.countTotalFeedback()} positivePercentage={this.countPositiveFeedbackPercentage()} />
-      <GlobalStyle/>
+          positive={positive}
+          neutral={neutral}
+          negative={negative}
+          total={countTotalFeedback()}
+          positivePercentage={countPositiveFeedbackPercentage()}
+        />
+        <GlobalStyle />
       </Section>
-      </MainContainer>
-          );
-  }
+    </MainContainer>
+  );
 };
 
-export default App
+export default App;
